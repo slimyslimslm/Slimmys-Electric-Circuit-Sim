@@ -11,3 +11,4 @@ class Button(pygame.sprite.Sprite):
         self.rect.topleft = x, y
         self.name = name
         self.file_path = file_path
+    

@@ -2,6 +2,7 @@ import pygame
 from button import Button
 from circuitcomponent import CircuitComponentSprite, CircuitComponent, Wire
 from dragdropmenu import DragDropMenu
+from dynamicmenu import DynamicMenu
 from electric_circuit import ElectricCircuit
 
 pygame.init()
@@ -13,6 +14,7 @@ FPS = 60
 
 # Colors:
 WHITE = 255, 255, 255
+BLACK = 0, 0, 0
 SIDE_BAR_COLOR = 50, 140, 240
 
 BUFFER = 5
@@ -41,6 +43,13 @@ class Simulation:
         self.components = []
         self.component_menu = DragDropMenu(SIDE_BAR_COLOR, pygame.font.SysFont("comicsans", 10), 
                                   pygame.Rect(1200, 5, 295, HEIGHT - 10), COMPONENTS_LIST)
+        
+
+        # Only meant to create self.dynamic_menu's rectangle, not used again
+        temp_rect = pygame.Rect(0, 0, 600, 125)
+        temp_rect.center = (WIDTH - 295)//2, HEIGHT - 75
+
+        self.dynamic_menu = DynamicMenu(temp_rect, pygame.font.SysFont("comicsans", 10))
         
         self.circuit = ElectricCircuit()
 
@@ -121,6 +130,10 @@ class Simulation:
             # Check component selection
             component.check_selection(self.cursor)
             component.check_circle_selection(self.cursor)
+            if not component.left_rect.collidepoint(pygame.mouse.get_pos()):
+                component.left_circle_selected = False
+            if not component.right_rect.collidepoint(pygame.mouse.get_pos()):
+                component.right_circle_selected = False 
         
         self.check_buttons_selection()
 
@@ -130,10 +143,6 @@ class Simulation:
             if component.being_dragged:
                 component.being_dragged = False 
                 break 
-            if not component.left_rect.collidepoint(pygame.mouse.get_pos()):
-                component.left_circle_selected = False
-            if not component.right_rect.collidepoint(pygame.mouse.get_pos()):
-                component.right_circle_selected = False 
 
         """TO DO"""
         self.attach2()
@@ -149,8 +158,7 @@ class Simulation:
             
             for component in self.components:
                 if (component.left_circle_selected or component.right_circle_selected):
-                    if self.handle_component_circle_selection(component, event):
-                        break
+                    pass 
 
     def add_wire(self, component, key) -> None:
         """Adds a wire when an arrow key is selected"""
@@ -368,18 +376,7 @@ class Simulation:
         for component in self.components:
             all_circle_rects.append(component.left_rect)
             all_circle_rects.append(component.right_rect)
-        
-        """
-        for component in self.components:
-            result = self._update_one_circle_side_color(component, all_circle_rects, "left")
-            if result:
-                return
-            result2 = self._update_one_circle_side_color(component, all_circle_rects, "right")
-            if result2:
-                return 
-        """   
 
-        
         for component in self.components:
             left_collided_rect_indices = component.left_rect.collidelistall(all_circle_rects)
             right_collided_rect_indices = component.right_rect.collidelistall(all_circle_rects)
@@ -434,6 +431,13 @@ class Simulation:
                 #all_circle_rects.append(component.left_rect)
                 #all_circle_rects.append(component.right_rect)
         
+    def update_dynamic_menu_state(self) -> None:
+        for component in self.components:
+            if component.left_circle_selected or component.right_circle_selected:
+                self.dynamic_menu.select_state = "Connected Circle"
+            else:
+                self.dynamic_menu.select_state = "Default"
+
 
     def draw(self) -> None:
         self.window.fill(WHITE)
@@ -447,6 +451,8 @@ class Simulation:
             arrow_cursor_image_rect.center = pygame.mouse.get_pos()
             self.window.blit(self.arrow_cursor_image, arrow_cursor_image_rect)
 
+        self.dynamic_menu.draw(self.window)
+
         pygame.display.update()
 
     def run_sim(self) -> None:
@@ -456,6 +462,7 @@ class Simulation:
             self.update_cursor()
             self.update_component_position()
             self.update_component_circle_color()
+            self.update_dynamic_menu_state()
             self.draw()
 
         pygame.quit()
