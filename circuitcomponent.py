@@ -127,7 +127,6 @@ class CircuitComponent(CircuitComponentSprite):
         
         while stack != []:
                 node = stack.pop()
-                print(node.name)
                 if node not in visited:
                     node.rect.centerx += x_diff
                     node.rect.centery += y_diff 
@@ -152,7 +151,9 @@ class CircuitComponent(CircuitComponentSprite):
     def check_selection(self, cursor):
         if self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
             self.being_dragged = True 
-        elif self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Rotate Cursor":
+        elif self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Rotate Cursor" \
+            and (self.left_components == [] and self.right_components == []): # Makes sure component is not connected to anything
+
             self.rotation_state += 1
             self.update_circle_positions(self.rect.centerx, self.rect.centery)
 

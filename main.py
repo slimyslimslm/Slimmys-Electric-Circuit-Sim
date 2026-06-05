@@ -137,7 +137,6 @@ class Simulation:
         
         self.check_buttons_selection()
 
-
     def mouse_button_up_events(self) -> None:
         for component in self.components:
             if component.being_dragged:
@@ -161,11 +160,11 @@ class Simulation:
                     pass 
 
     def add_wire(self, component, key) -> None:
+        """NOT USING THIS METHOD"""
         """Adds a wire when an arrow key is selected"""
         """BASE THE METHOD OFF OF THE _ATTACH METHOD"""
 
         new_wire = Wire(0, 0, ELEMENT_SIZE, ELEMENT_SIZE,  r"assets\Based Wire-1.png.png")
-        print(f"1: {new_wire.rect.centerx, new_wire.rect.centery}")
         
         if component.left_circle_selected:
             component.left_components.append(new_wire)
@@ -175,14 +174,12 @@ class Simulation:
             circle_rect = component.right_rect
 
         centerx, centery = circle_rect.centerx, circle_rect.centery
-        print(f"2: {centerx, centery}")
 
         if key == pygame.K_UP:
             new_wire.rotation_state += 1
             new_wire.update_circle_positions(new_wire.rect.centerx, new_wire.rect.centery)
             x_difference = centerx - new_wire.right_rect.centerx 
             y_difference = centery - new_wire.right_rect.centery
-            print(f"3: {x_difference, y_difference}")
             new_wire.right_components.append(component)
         elif key == pygame.K_DOWN:
             new_wire.rotation_state += 1 
@@ -319,7 +316,6 @@ class Simulation:
         """Handle when component end circle points are selected"""
         if event.type == pygame.KEYDOWN and (event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT):
                 if self.check_arrow_input_valid(component, event.key):
-                    print(component.name)
                     self.add_wire(component, event.key)
                     return True 
         return False 
@@ -364,7 +360,6 @@ class Simulation:
             component.left_color == BLUE
         elif side == "right":
             component.right_color == BLUE 
-        print("sdfsdfsdf")
 
         return False 
 
@@ -431,12 +426,31 @@ class Simulation:
                 #all_circle_rects.append(component.left_rect)
                 #all_circle_rects.append(component.right_rect)
         
+    def _update_simulation_buttons(self, new_state: str) -> None:
+        """Adds the new_state's buttons from the dynamic menu to self.buttons while removing the buttons from the old state"""
+        old_state = self.dynamic_menu.select_state
+
+        """Remove the old buttons except for those not contained in self.dynamic_menu like the cursor and arrow buttons"""
+        for button in self.buttons:
+            if button in self.dynamic_menu.selection_states[old_state][0]:
+                self.buttons.remove(button)
+        
+        """Add the new buttons to self.buttons"""
+        for button in self.dynamic_menu.selection_states[new_state][0]:
+            self.buttons.add(button)
+        
+
     def update_dynamic_menu_state(self) -> None:
         for component in self.components:
             if component.left_circle_selected or component.right_circle_selected:
-                self.dynamic_menu.select_state = "Connected Circle"
-            else:
-                self.dynamic_menu.select_state = "Default"
+                new_state = "Connected Circle"
+                self._update_simulation_buttons(new_state)
+                self.dynamic_menu.select_state = new_state 
+                break
+        else:
+            new_state = "Default"
+            self._update_simulation_buttons(new_state)
+            self.dynamic_menu.select_state = new_state
 
 
     def draw(self) -> None:
@@ -458,7 +472,7 @@ class Simulation:
     def run_sim(self) -> None:
         while self.run:
             CLOCK.tick(FPS)
-            self.event_loop()
+            self.event_loop() # Includes events that occur when mouse button down or up 
             self.update_cursor()
             self.update_component_position()
             self.update_component_circle_color()

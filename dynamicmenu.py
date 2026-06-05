@@ -22,22 +22,19 @@ class DynamicMenu:
         self.selection_states = {"Default": (pygame.sprite.Group(), self.font.render("", True, (0, 0, 0))), 
                        "Connected Circle": (pygame.sprite.Group([scissors_button]), 
                                             self.font.render(self._connected_circle_text(), True, (0, 0, 0)))}
-        
-        
+    
 
     def _connected_circle_text(self) -> str:
         """Returns connected circle text"""
         return "something"
-
 
     def draw(self, window: pygame.Surface):
         pygame.draw.rect(window, self.color, self.rect, self.border)
 
         # Note that the buttons in the menu are drawn in the main file since they will be included in the simulation's button sprite group
 
-        buttons, text = self.selection_states[self.select_state]
+        text = self.selection_states[self.select_state][1]
 
-        buttons.draw(window)
         text_rect = text.get_rect()
         text_rect.center = self.rect.centerx, self.rect.centery + self.rect.height//4
         window.blit(text, text_rect)
