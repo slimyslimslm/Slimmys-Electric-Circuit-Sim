@@ -65,8 +65,17 @@ class Simulation:
             pygame.mouse.set_visible(False)
         elif self.cursor == "Default Cursor":
             pygame.mouse.set_visible(True)
+
+
+    def split_components(self) -> None:
+        """Split the selected components"""
+        for component in self.components:
+            if component.left_circle_selected:
+                component.left_components = [] 
+
+            elif component.right_circle_selected:
+                component.right_components = []
         
-    
     def check_buttons_selection(self):
         """Handles events where a button is selected. Assume the user pressed down on their mouse."""
         for button in self.buttons:
@@ -75,6 +84,8 @@ class Simulation:
                     self.cursor = "Default Cursor"
                 elif button.name == "Rotate Cursor":
                     self.cursor = "Rotate Cursor"
+                elif button.name == "Scissors Button":
+                    self.split_components()  
 
     def _attach(self, component, index, circle_center):
         other_component = self.components[index//2]
@@ -126,6 +137,8 @@ class Simulation:
         if self.cursor == "Default Cursor":
             self.component_menu.check_menu_selection(self.components)
 
+        self.check_buttons_selection()
+
         for component in self.components:
             # Check component selection
             component.check_selection(self.cursor)
@@ -134,8 +147,6 @@ class Simulation:
                 component.left_circle_selected = False
             if not component.right_rect.collidepoint(pygame.mouse.get_pos()):
                 component.right_circle_selected = False 
-        
-        self.check_buttons_selection()
 
     def mouse_button_up_events(self) -> None:
         for component in self.components:
@@ -150,10 +161,10 @@ class Simulation:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.run = False 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                self.mouse_button_down_events()
             if event.type == pygame.MOUSEBUTTONUP:
                 self.mouse_button_up_events()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.mouse_button_down_events()
             
             for component in self.components:
                 if (component.left_circle_selected or component.right_circle_selected):
@@ -327,7 +338,6 @@ class Simulation:
             if component.being_dragged is False and self.component_menu.rect.contains(component.rect):
                 self.components.remove(component)
 
-
     def _update_one_circle_side_color(self, component: CircuitComponent, all_circle_rects: list, side: str) -> None:
         if side == "left":
             side_rect = component.left_rect
@@ -439,7 +449,6 @@ class Simulation:
         for button in self.dynamic_menu.selection_states[new_state][0]:
             self.buttons.add(button)
         
-
     def update_dynamic_menu_state(self) -> None:
         for component in self.components:
             if component.left_circle_selected or component.right_circle_selected:
@@ -451,7 +460,6 @@ class Simulation:
             new_state = "Default"
             self._update_simulation_buttons(new_state)
             self.dynamic_menu.select_state = new_state
-
 
     def draw(self) -> None:
         self.window.fill(WHITE)

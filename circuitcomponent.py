@@ -54,15 +54,12 @@ class CircuitComponent(CircuitComponentSprite):
         self.left_color = (255, 0, 0)
         self.right_color = (255, 0, 0)
 
-        """Was working on this"""
         self.left_circle_selected = False 
         self.right_circle_selected = False 
 
         self._rotation_state = 0
 
         self.being_dragged = False 
-
-    """NEED GETTERS AND SETTERS TO UPDATE THE CIRCLES"""
 
     @property
     def image(self) -> pygame.Surface:
@@ -103,6 +100,19 @@ class CircuitComponent(CircuitComponentSprite):
     
         # x_center, y_center = self.image.get_rect().centerx, self.image.get_rect().centery
         # self.update_circle_positions(x_center, y_center)
+    
+
+    def increment_component(self) -> None:
+        """Move components ever so slightly when they are split apart"""
+        if self.rotation_state == 0:
+            pass 
+        elif self.rotation_state == 1:
+            pass 
+        elif self.rotation_state == 2:
+            pass 
+        else: # self.rotation_state == 3
+            pass
+
 
     def move_component(self):
 
