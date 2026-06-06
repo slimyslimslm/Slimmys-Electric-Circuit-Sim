@@ -19,7 +19,7 @@ class DynamicMenu:
         scissors_button.rect.center = self.rect.centerx, self.rect.centery - self.rect.height//4
 
         # key is state, value is a tuple where 0th element is list of buttons, 1st element is the text render to be printed below the buttons 
-        self.selection_states = {"Default": (pygame.sprite.Group(), self.font.render("", True, (0, 0, 0))), 
+        self.selection_states = {"Default": (pygame.sprite.Group(), self.font.render("Click the rotate button to rotate a component. Click the scissors button to split a component", True, (0, 0, 0))), 
                        "Connected Circle": (pygame.sprite.Group(), 
                                             self.font.render(self._connected_circle_text(), True, (0, 0, 0)))}
     

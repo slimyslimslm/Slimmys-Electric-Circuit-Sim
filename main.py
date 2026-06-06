@@ -167,178 +167,37 @@ class Simulation:
                 self.mouse_button_up_events()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.mouse_button_down_events()
-            
-            for component in self.components:
-                if (component.left_circle_selected or component.right_circle_selected):
-                    pass 
-
-    def add_wire(self, component, key) -> None:
-        """NOT USING THIS METHOD"""
-        """Adds a wire when an arrow key is selected"""
-        """BASE THE METHOD OFF OF THE _ATTACH METHOD"""
-
-        new_wire = Wire(0, 0, ELEMENT_SIZE, ELEMENT_SIZE,  r"assets\Based Wire-1.png.png")
-        
-        if component.left_circle_selected:
-            component.left_components.append(new_wire)
-            circle_rect = component.left_rect
-        else:
-            component.right_components.append(new_wire)
-            circle_rect = component.right_rect
-
-        centerx, centery = circle_rect.centerx, circle_rect.centery
-
-        if key == pygame.K_UP:
-            new_wire.rotation_state += 1
-            new_wire.update_circle_positions(new_wire.rect.centerx, new_wire.rect.centery)
-            x_difference = centerx - new_wire.right_rect.centerx 
-            y_difference = centery - new_wire.right_rect.centery
-            new_wire.right_components.append(component)
-        elif key == pygame.K_DOWN:
-            new_wire.rotation_state += 1 
-            new_wire.update_circle_positions(new_wire.rect.centerx, new_wire.rect.centery)
-            x_difference = centerx - new_wire.left_rect.centerx 
-            y_difference = centery - new_wire.left_rect.centery
-            new_wire.left_components.append(component)
-        elif key == pygame.K_RIGHT:
-            x_difference = centerx - new_wire.left_rect.centerx 
-            y_difference = centery - new_wire.left_rect.centery
-            new_wire.left_components.append(component)
-        else: # key == pygame.K_LEFT
-            x_difference = centerx - new_wire.right_rect.centerx 
-            y_difference = centery - new_wire.right_rect.centery
-            new_wire.right_components.append(component)
     
-       #  new_wire.left_rect.x += x_difference
-        # new_wire.left_rect.y += y_difference 
-        new_wire.rect.centerx += x_difference 
-        new_wire.rect.centery += y_difference 
-        # new_wire.right_rect.x += x_difference
-        # new_wire.right_rect.y += y_difference   
-        new_wire.update_circle_positions(new_wire.rect.centerx, new_wire.rect.centery)
-        self.components.append(new_wire)
-        
-    def check_arrow_input_valid(self, component, key) -> bool:
-        """Returns true or false"""
-        if component.left_circle_selected:
-            for other_component in component.left_components:
-                if key == "up":
-                    if component.rotation_state == 0 or component.rotation_state == 2:
-                        if other_component.rotation_state == 1 and component in other_component.right_components:
-                            return False 
-                        elif other_component.rotation_state == 3 and component in other_component.left_components:
-                            return False 
-                    elif component.rotation_state == 1: # Note that rotation state 3 is not possible
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False 
-                    elif component.rotation_state == 3:
-                        return False 
-                    
-                if key == "down":
-                    if component.rotation_state == 0 or component.rotation_state == 2:
-                        if other_component.rotation_state == 1 and component in other_component.left_components:
-                            return False 
-                        elif other_component.rotation_state == 3 and component in other_component.right_components:
-                            return False
-                    elif component.rotation_state == 3:
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False
-                    elif component.rotation_state == 1:
-                        return False 
-                    
-                if key == "right":
-                    if component.rotation_state == 2: # Note that rotation state 2 is not possible:
-                        if other_component.rotation_state == 0 or other_component.rotation_state == 2:
-                            return False 
-                    elif component.rotation_state == 0:
-                        return False
-                    elif component.rotation_state == 1 or component.rotation_state == 3:
-                        if other_component.rotation_state == 0 and component in other_component.left_components:
-                            return False 
-                        elif other_component.rotation_state == 2 and component in other_component.right_components:
-                            return False 
-                    
-                if key == "left":
-                    if component.rotation_state == 0:
-                        if other_component.rotation_state == 0 or other_component.rotation_state == 2:
-                            return False 
-                    elif component.rotation_state == 2:
-                        return False 
-                    elif component.rotation_state == 1 or component.rotation_state == 3:
-                        if other_component.rotation_state == 0 and component in other_component.right_components:
-                            return False 
-                        elif other_component.rotation_state == 2 and component in other_component.left_components:
-                            return False                         
-     
-            return True 
-        
-        else: 
-            """TO IMPLEMENT"""
-            for other_component in component.right_components:
-                if key == pygame.K_UP:
-                    if component.rotation_state == 1:
-                        return False 
-                    elif component.rotation_state == 3:
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False 
-                    elif component.rotation_state == 0 or component.rotation_state == 2:
-                        if other_component.rotation_state == 1 and component in other_component.right_components:
-                            return False 
-                        elif other_component.rotation_state == 3 and component in other_component.left_components:
-                            return False 
+    def circuit_has_dragging_component(self, component) -> None:
+        """WORKING HERE"""
+        stack = component.left_components + component.right_components
+        visited = {component}
 
-                elif key == pygame.K_DOWN:
-                    if component.rotation_state == 0 or component.rotation_state == 2:
-                        if other_component.rotation_state == 1 and component in other_component.left_components:
-                            return False 
-                        elif other_component.rotation_state == 3 and component in other_component.right_components:
-                            return False  
-                    elif component.rotation_state == 3:
-                        return False 
-                    elif component.rotation_state == 1:
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False 
-                        
-                elif key == pygame.K_RIGHT:
-                    if component.rotation_state == 0:
-                        return False 
-                    elif component.rotation_state == 2:
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False 
-                    elif component.rotation_state == 1 or component.rotation_state == 3:
-                        if other_component.rotation_state == 0 and component in other_component.left_components:
-                            return False 
-                        if other_component.rotation_state == 2 and component in other_component.right_components:
-                            return False 
-                        
-                elif key == pygame.K_LEFT:
-                    if component.rotation_state == 2:
-                        return False 
-                    elif component.rotation_state == 0:
-                        if other_component.rotation_state == 1 or other_component.rotation_state == 3:
-                            return False 
-                    elif component.rotation_state == 1 or component.rotation_state == 3:
-                        if other_component.rotation_state == 0 and component in other_component.right_components:
-                            return False 
-                        elif other_component.rotation_state == 2 and component in other_component.left_components:
-                            return False 
-                    
-            return True 
-
-    def handle_component_circle_selection(self, component, event) -> None:
-        """Handle when component end circle points are selected"""
-        if event.type == pygame.KEYDOWN and (event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT):
-                if self.check_arrow_input_valid(component, event.key):
-                    self.add_wire(component, event.key)
+        while stack != []:
+            node = stack.pop()
+            if node not in visited:
+                if node.being_dragged:
                     return True 
-        return False 
+                
+                visited.add(node)
+                stack.extend(node.left_components + node.right_components)
 
+        return False 
+        
     def update_component_position(self) -> None:
         for component in self.components:
             component.move_component()
 
             if component.being_dragged is False and self.component_menu.rect.contains(component.rect):
-                self.components.remove(component)
+                if component.being_dragged:
+                    self.components.remove(component)
+                elif not self.circuit_has_dragging_component(component):
+                    for neighbor in component.left_components + component.right_components:
+                        if component in neighbor.left_components:
+                            neighbor.left_components.remove(component)
+                        elif component in neighbor.right_components:
+                            neighbor.right_components.remove(component)
+                    self.components.remove(component)
 
     def _update_one_circle_side_color(self, component: CircuitComponent, all_circle_rects: list, side: str) -> None:
         if side == "left":

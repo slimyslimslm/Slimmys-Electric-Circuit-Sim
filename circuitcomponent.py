@@ -99,20 +99,7 @@ class CircuitComponent(CircuitComponentSprite):
             self.image = pygame.transform.rotate(self.image, -90)
     
         # x_center, y_center = self.image.get_rect().centerx, self.image.get_rect().centery
-        # self.update_circle_positions(x_center, y_center)
-    
-
-    def increment_component(self) -> None:
-        """Move components ever so slightly when they are split apart"""
-        if self.rotation_state == 0:
-            pass 
-        elif self.rotation_state == 1:
-            pass 
-        elif self.rotation_state == 2:
-            pass 
-        else: # self.rotation_state == 3
-            pass
-
+        # self.update_circle_positions(x_center, y_center) 
 
     def move_component(self):
 
@@ -133,7 +120,7 @@ class CircuitComponent(CircuitComponentSprite):
                 stack.append(component)
 
         else:
-            return
+            return 
         
         while stack != []:
                 node = stack.pop()
@@ -151,12 +138,43 @@ class CircuitComponent(CircuitComponentSprite):
 
                     visited.add(node)
 
+
     def check_circle_selection(self, cursor):
         # Use rotation states and component circles to figure out the components orientation
         if self.left_rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
             self.left_circle_selected = True
         elif self.right_rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
             self.right_circle_selected = True 
+
+    def split_component(self) -> None:
+        """Split the component from other components and move it slightly depending on rotations state"""
+        for component in self.left_components + self.right_components:
+            if self in component.left_components:
+                component.left_components.remove(self)
+            if self in component.right_components:
+                component.right_components.remove(self)
+
+        self.left_components = []
+        self.right_components = []
+
+        increment = 4 * self.selection_circle_radius
+
+        if self.rotation_state == 0:
+            self.left_rect.y += increment 
+            self.rect.y += increment
+            self.right_rect.y += increment
+        elif self.rotation_state == 1:
+            self.left_rect.x += increment
+            self.rect.x += increment
+            self.right_rect.x += increment 
+        elif self.rotation_state == 2:
+            self.left_rect.y -= increment 
+            self.rect.y -= increment 
+            self.right_rect.y -= increment
+        else: # self.rotation_state == 3
+            self.left_rect.x -= increment 
+            self.rect.x -= increment 
+            self.right_rect.x -= increment 
 
     def check_selection(self, cursor):
         if self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
@@ -166,6 +184,10 @@ class CircuitComponent(CircuitComponentSprite):
 
             self.rotation_state += 1
             self.update_circle_positions(self.rect.centerx, self.rect.centery)
+
+        elif self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Scissors Cursor":
+            if len(self.left_components) > 0 or len(self.right_components) > 0: 
+                self.split_component()
 
     def update_circle_positions(self, new_center_x, new_center_y):
         if self.rotation_state == 0:
