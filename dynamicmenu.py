@@ -20,7 +20,7 @@ class DynamicMenu:
 
         # key is state, value is a tuple where 0th element is list of buttons, 1st element is the text render to be printed below the buttons 
         self.selection_states = {"Default": (pygame.sprite.Group(), self.font.render("", True, (0, 0, 0))), 
-                       "Connected Circle": (pygame.sprite.Group([scissors_button]), 
+                       "Connected Circle": (pygame.sprite.Group(), 
                                             self.font.render(self._connected_circle_text(), True, (0, 0, 0)))}
     
 

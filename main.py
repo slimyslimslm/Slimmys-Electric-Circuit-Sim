@@ -30,6 +30,7 @@ COMPONENTS_LIST = {"Battery": CircuitComponentSprite(0, 0, ELEMENT_SIZE, ELEMENT
                   "Inductor": CircuitComponentSprite(0, 0, ELEMENT_SIZE, ELEMENT_SIZE, r"assets\Based Inductor-1.png.png")}
 
 ROTATE_CURSOR_IMAGE_FILE = r"assets\Arrow Cursor-1.png.png"
+SCISSORS_CURSOR_IMAGE_FILE = r"assets\Scissors Cursor-1.png.png"
 
 RED = 255, 0, 0
 GREEN = 0, 255, 0
@@ -54,18 +55,19 @@ class Simulation:
         self.circuit = ElectricCircuit()
 
         self.buttons = pygame.sprite.Group([Button(30, 30, 50, 50, "Default Cursor", r"assets\Cursor Button-1.png.png"),
-                        Button(30, 90, 50, 50, "Rotate Cursor", r"assets\Rotate Button-1.png.png")])
+                        Button(30, 90, 50, 50, "Rotate Cursor", r"assets\Rotate Button-1.png.png"), 
+                        Button(30, 150, 50, 50, "Scissors Cursor", r"assets\Scissors Button-1.png.png")])
         self.cursor = "Default Cursor"
 
         self.arrow_cursor_image = pygame.image.load(ROTATE_CURSOR_IMAGE_FILE)
+        self.scissors_cursor_image = pygame.image.load(SCISSORS_CURSOR_IMAGE_FILE)
     
     def update_cursor(self) -> None:
         """Handles switching the cursor when needed"""
-        if self.cursor == "Rotate Cursor":
+        if self.cursor == "Rotate Cursor" or self.cursor == "Scissors Cursor":
             pygame.mouse.set_visible(False)
         elif self.cursor == "Default Cursor":
             pygame.mouse.set_visible(True)
-
 
     def split_components(self) -> None:
         """Split the selected components"""
@@ -84,8 +86,8 @@ class Simulation:
                     self.cursor = "Default Cursor"
                 elif button.name == "Rotate Cursor":
                     self.cursor = "Rotate Cursor"
-                elif button.name == "Scissors Button":
-                    self.split_components()  
+                elif button.name == "Scissors Cursor":
+                    self.cursor = "Scissors Cursor" 
 
     def _attach(self, component, index, circle_center):
         other_component = self.components[index//2]
@@ -468,10 +470,16 @@ class Simulation:
             component.draw(self.window)
 
         self.buttons.draw(self.window)
+
         if self.cursor == "Rotate Cursor":
             arrow_cursor_image_rect = self.arrow_cursor_image.get_rect()
             arrow_cursor_image_rect.center = pygame.mouse.get_pos()
             self.window.blit(self.arrow_cursor_image, arrow_cursor_image_rect)
+        elif self.cursor == "Scissors Cursor":
+    
+            scissors_cursor_image_rect = self.scissors_cursor_image.get_rect()
+            scissors_cursor_image_rect.center = pygame.mouse.get_pos()
+            self.window.blit(self.scissors_cursor_image, scissors_cursor_image_rect)
 
         self.dynamic_menu.draw(self.window)
 
