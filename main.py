@@ -52,7 +52,7 @@ class Simulation:
 
         self.dynamic_menu = DynamicMenu(temp_rect, pygame.font.SysFont("comicsans", 10))
         
-        self.circuit = ElectricCircuit()
+        self.circuits = []
 
         self.buttons = pygame.sprite.Group([Button(30, 30, 50, 50, "Default Cursor", r"assets\Cursor Button-1.png.png"),
                         Button(30, 90, 50, 50, "Rotate Cursor", r"assets\Rotate Button-1.png.png"), 

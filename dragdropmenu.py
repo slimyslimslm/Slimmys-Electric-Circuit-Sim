@@ -63,7 +63,7 @@ class DragDropMenu:
         elif name == "Inductor":
             return Inductor(rectangle.x, rectangle.y, sprite.rect.width, sprite.rect.height, sprite.file_path)
 
-    def check_menu_selection(self, components_list: list[CircuitComponent]):
+    def check_menu_selection(self, components_list: list[CircuitComponent], circuits_list: list[CircuitComponent]):
         """Checks if user selects element in the menu"""
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
