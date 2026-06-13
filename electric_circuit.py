@@ -1,13 +1,53 @@
 import pygame 
-from circuitcomponent import CircuitComponent
 
 class ElectricCircuit:
-    def __init__(self, components: list[CircuitComponent]):
+    def __init__(self, components):
+        if type(components) != list:
+            raise TypeError("Electric Circuit components must be a list of CircuitComponents")
         self.components = components 
 
     def __add__(self, other):
         return ElectricCircuit(self.components + other.components)
 
+    def __len__(self):
+        return len(self.components)
+    
+    def is_closed(self, starting_component=None) -> bool:
+        """Determines whether the circuit is closed or not"""
+        if starting_component is not None and starting_component not in self.components:
+            raise ValueError("Starting component not in self.components")
+        
+        elif len(self.components) == 0:
+            return True 
+
+        elif starting_component is None:
+            start = self.components[0]
+        
+        else:
+            start = starting_component 
+
+        stack = []
+
+        for component in start.right_components:
+            stack.append(component)
+
+        previous = start 
+
+        while stack != []:
+            node = stack.pop()
+
+            print(node.name, start.name)
+
+            if node is start:
+                return True 
+            if node in previous.left_components:
+                stack.extend([c for c in node.right_components])
+            elif node in previous.right_components:
+                stack.extend([c for c in node.left_components])
+
+            previous = node 
+
+        return False 
 
 
 """

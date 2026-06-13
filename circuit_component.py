@@ -1,4 +1,5 @@
 import pygame
+from electric_circuit import ElectricCircuit
 
 class CircuitComponentSprite(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, img) -> None:
@@ -101,6 +102,14 @@ class CircuitComponent(CircuitComponentSprite):
         # x_center, y_center = self.image.get_rect().centerx, self.image.get_rect().centery
         # self.update_circle_positions(x_center, y_center) 
 
+    def find_circuit(self, circuit_list: list[ElectricCircuit]) -> ElectricCircuit:
+        """Find what electric circuit thie component is part of"""
+        for c in circuit_list:
+            if self in c.components:
+                return c
+
+        raise ValueError("Component is not a part of a circuit")   
+
     def move_component(self):
 
         if self.being_dragged:
@@ -124,6 +133,7 @@ class CircuitComponent(CircuitComponentSprite):
         
         while stack != []:
                 node = stack.pop()
+                # print(node.name)
                 if node not in visited:
                     node.rect.centerx += x_diff
                     node.rect.centery += y_diff 
@@ -146,13 +156,20 @@ class CircuitComponent(CircuitComponentSprite):
         elif self.right_rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
             self.right_circle_selected = True 
 
-    def split_component(self) -> None:
+    def split_component(self, circuits) -> None:
         """Split the component from other components and move it slightly depending on rotations state"""
+        # print(self.left_components, self.right_components)
         for component in self.left_components + self.right_components:
-            if self in component.left_components:
+            if self in component.left_components and self is not component:
                 component.left_components.remove(self)
-            if self in component.right_components:
+                circuit = self.find_circuit(circuits)
+                circuit.components.remove(self)
+                circuits.append(ElectricCircuit([self]))
+            if self in component.right_components and self is not component:
                 component.right_components.remove(self)
+                circuit = self.find_circuit(circuits)
+                circuit.components.remove(self)
+                circuits.append(ElectricCircuit([self]))
 
         self.left_components = []
         self.right_components = []
@@ -176,7 +193,7 @@ class CircuitComponent(CircuitComponentSprite):
             self.rect.x -= increment 
             self.right_rect.x -= increment 
 
-    def check_selection(self, cursor):
+    def check_selection(self, cursor, circuits):
         if self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Default Cursor":
             self.being_dragged = True 
         elif self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Rotate Cursor" \
@@ -187,7 +204,7 @@ class CircuitComponent(CircuitComponentSprite):
 
         elif self.rect.collidepoint(pygame.mouse.get_pos()) and cursor == "Scissors Cursor":
             if len(self.left_components) > 0 or len(self.right_components) > 0: 
-                self.split_component()
+                self.split_component(circuits)
 
     def update_circle_positions(self, new_center_x, new_center_y):
         if self.rotation_state == 0:
@@ -239,13 +256,16 @@ class Resistor(CircuitComponent):
 class Capacitor(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
+        self.name = "Capacitor"
 
 class Switch(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
         self.is_closed = False 
+        self.name = "Switch"
 
 class Inductor(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
+        self.name = "Inductor"
         

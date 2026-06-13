@@ -1,4 +1,5 @@
-from circuitcomponent import CircuitComponentSprite, CircuitComponent, Battery, Wire, Resistor, Inductor, Switch, Capacitor
+from circuit_component import CircuitComponentSprite, CircuitComponent, Battery, Wire, Resistor, Inductor, Switch, Capacitor
+from electric_circuit import ElectricCircuit
 import pygame 
 
 class DragDropMenu:
@@ -63,7 +64,7 @@ class DragDropMenu:
         elif name == "Inductor":
             return Inductor(rectangle.x, rectangle.y, sprite.rect.width, sprite.rect.height, sprite.file_path)
 
-    def check_menu_selection(self, components_list: list[CircuitComponent]):
+    def check_menu_selection(self, circuits_list: list[ElectricCircuit]):
         """Checks if user selects element in the menu"""
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -72,7 +73,7 @@ class DragDropMenu:
                 new_component = self.create_component(name, component_sprite, mouse_x, mouse_y)
                 if new_component is not None:
                     new_component.being_dragged = True 
-                    components_list.append(new_component)
+                    circuits_list.append(ElectricCircuit([new_component]))
 
 
     def draw(self, window) -> None:
