@@ -14,6 +14,8 @@ class DynamicMenu:
         self.font = font
         self.select_state = "Default"
 
+        self.voltage_text = "0"
+        self.resistance_text = "0"
 
         scissors_button = Button(self.rect.centerx, self.rect.centery - self.rect.height//4, 50, 50, "Scissors Button", r"assets\Scissors Button-1.png.png")
         scissors_button.rect.center = self.rect.centerx, self.rect.centery - self.rect.height//4
@@ -21,10 +23,11 @@ class DynamicMenu:
         # key is state, value is a tuple where 0th element is list of buttons, 1st element is the text render to be printed below the buttons 
         self.selection_states = {"Default": (pygame.sprite.Group(), self.font.render("Click the rotate button to rotate a component. Click the scissors button to split a component", True, (0, 0, 0))), 
                        "Connected Circle": (pygame.sprite.Group(), 
-                                            self.font.render(self._connected_circle_text(), True, (0, 0, 0)))}
-    
-
-    def _connected_circle_text(self) -> str:
+                                            self.font.render(self._connected_circle_text(), True, (0, 0, 0))), 
+                        "Battery": (pygame.sprite.Group(), self.font.render(self.voltage_text, True, (0, 0, 0))), 
+                        "Resistor": (pygame.sprite.Group(), self.font.render(self.resistance_text, True, (0, 0, 0)))}
+        
+    def _connected_circle_text(self):
         """Returns connected circle text"""
         return "something"
 

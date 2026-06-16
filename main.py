@@ -187,7 +187,7 @@ class Simulation:
             left_collided_indices = component.left_rect.collidelistall(all_circle_rects)
             right_collided_indices = component.right_rect.collidelistall(all_circle_rects) 
         
-            print(f"All Circle Rects: {all_circle_rects}")
+            # print(f"All Circle Rects: {all_circle_rects}")
             for index in left_collided_indices:
                 other_rect = all_circle_rects[index]
                 # print(f"Thingy {component.left_rect is not other_rect}")
@@ -201,7 +201,7 @@ class Simulation:
                     self._attach3(component, index, components, component.right_rect.center, "Right")
         
         for circuit in self.circuits:
-            print(circuit.is_closed())
+            # print(circuit.is_closed())
             pass
 
     def _attach(self, component, other_component, index, circle_center):
@@ -518,6 +518,13 @@ class Simulation:
 
         pygame.display.update()
 
+    def debug(self) -> None:
+        """Method to print stuff to help me debug"""
+        for circuit in self.circuits:
+            for component in circuit.components:
+                if component.name == "Resistor":
+                    print(circuit.is_closed("Left", component), circuit.is_closed("Right", component))
+
     def run_sim(self) -> None:
         while self.run:
             CLOCK.tick(FPS)
@@ -527,6 +534,13 @@ class Simulation:
             self.update_component_circle_color()
             self.update_dynamic_menu_state()
             self.draw()
+            # self.debug()
+
+            """
+            for circuit in self.circuits:
+                if circuit.is_closed():
+                    print(circuit.calculate_current())
+            """
 
         pygame.quit()
 

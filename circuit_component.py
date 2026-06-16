@@ -60,6 +60,8 @@ class CircuitComponent(CircuitComponentSprite):
 
         self._rotation_state = 0
 
+        self.current = 0
+
         self.being_dragged = False 
 
     @property
@@ -242,6 +244,7 @@ class Battery(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
         self.name = "Battery"
+        self.voltage = 9 
 
 class Wire(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
@@ -252,6 +255,7 @@ class Resistor(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
         self.name = "Resistor"
+        self.resistance = 5 
 
 class Capacitor(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
@@ -261,7 +265,7 @@ class Capacitor(CircuitComponent):
 class Switch(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
-        self.is_closed = False 
+        self.is_open = True  
         self.name = "Switch"
 
 class Inductor(CircuitComponent):
