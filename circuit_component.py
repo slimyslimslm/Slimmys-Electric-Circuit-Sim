@@ -110,7 +110,7 @@ class CircuitComponent(CircuitComponentSprite):
             if self in c.components:
                 return c
 
-        raise ValueError("Component is not a part of a circuit")   
+        raise ValueError("Component is not a part of a circuit")  
 
     def move_component(self):
 
@@ -272,4 +272,6 @@ class Inductor(CircuitComponent):
     def __init__(self, x, y, width, height, img) -> None: 
         super().__init__(x, y, width, height, img)
         self.name = "Inductor"
-        
+    
+
+    

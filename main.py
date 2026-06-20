@@ -4,6 +4,7 @@ from circuit_component import CircuitComponentSprite, CircuitComponent, Wire
 from dragdropmenu import DragDropMenu
 from dynamicmenu import DynamicMenu
 from electric_circuit import ElectricCircuit
+from node import Node 
 
 pygame.init()
 
@@ -91,6 +92,86 @@ class Simulation:
                     self.cursor = "Rotate Cursor"
                 elif button.name == "Scissors Cursor":
                     self.cursor = "Scissors Cursor" 
+    
+    def _add_create_node_component(self, component) -> None:
+        """Create a node after a component that is not a wire has just been attached"""
+        circuit = component.find_circuit(self.circuits)
+
+        wires_list = []
+        end_components = [component]
+
+        stack = [c for c in component.left_components] # Then do the same with right_components
+        visited = {component}
+
+        while stack != []:
+            other = stack.pop()
+            if other not in visited:
+                if other.name == "Wire":
+                    wires_list.append(other)
+                    stack.extend[other.left_components + other.right_components]
+                else:
+                    end_components.add(other)
+                visited.add(other)
+        
+        if len(end_components) >= 2:
+            circuit.nodes.append(Node(end_components, wires_list))
+        
+        wires_list = []
+        end_components = [component]
+
+        stack = [c for c in component.right_components] # Then do the same with right_components
+        visited = {component}
+
+        while stack != []:
+            other = stack.pop()
+            if other not in visited:
+                if other.name == "Wire":
+                    wires_list.append(other)
+                    stack.extend[other.left_components + other.right_components]
+                else:
+                    end_components.add(other)
+                visited.add(other)
+        
+        if len(end_components) >= 2:
+            circuit.nodes.append(Node(end_components, wires_list))
+
+    def _add_create_node_wire(self, component: Wire) -> None:
+        """Create a node after a wire has just been attached"""
+        circuit = component.find_circuit(self.circuits)
+
+        wires_list = [component]
+        visited = {component}
+
+        end_components = []
+        stack = []
+        visited = {component}
+
+        wire_in_components = lambda components: any(component.name == "Wire" for component in components)
+
+        if node := circuit.find_node(circuit) and wire_in_components(component.left_components) and wire_in_components(component.right_components):
+            node.add_wire(component)
+            return
+        
+        stack.extend([c for c in component.left_components + component.right_components])
+
+        while stack != []:
+            other = stack.pop()
+
+            if other not in visited:
+                if other.name == "Wire":
+                    wires_list.append(other)
+                    stack.extend([c for c in other.left_components + other.right_components])
+                    visited.add(other)
+                else:
+                    end_components.append(other)
+    
+        if len(end_components) >= 2:
+            circuit.nodes.append(Node(end_components, wires_list)) 
+
+    def add_create_nodes(self, component) -> None:
+        """After attaching a component, add/create nodes when necessary"""
+        if component.name == "Wire":
+            self._add_create_node_wire(component)
 
     def _attach3(self, component, index, components_minus_one, circle_center, side):
         other_component = components_minus_one[index//2]
@@ -170,15 +251,13 @@ class Simulation:
                     if component not in visited:
                         stack.append(component)
 
-                visited.add(node)
-        
+                visited.add(node) 
 
     def attach3(self):
         components = self.all_components
         for component in self.all_components:
             if not component.being_dragged:
                 continue 
-                pass
     
             components = self.all_components
             components.remove(component)
@@ -199,10 +278,6 @@ class Simulation:
                 other_rect = all_circle_rects[index]
                 if component.right_rect is not other_rect:
                     self._attach3(component, index, components, component.right_rect.center, "Right")
-        
-        for circuit in self.circuits:
-            # print(circuit.is_closed())
-            pass
 
     def _attach(self, component, other_component, index, circle_center):
         """"
@@ -522,8 +597,8 @@ class Simulation:
         """Method to print stuff to help me debug"""
         for circuit in self.circuits:
             for component in circuit.components:
-                if component.name == "Resistor":
-                    print(circuit.is_closed("Left", component), circuit.is_closed("Right", component))
+                if component.name == "Battery":
+                    print(len(circuit.nodes))
 
     def run_sim(self) -> None:
         while self.run:
@@ -534,13 +609,7 @@ class Simulation:
             self.update_component_circle_color()
             self.update_dynamic_menu_state()
             self.draw()
-            # self.debug()
-
-            """
-            for circuit in self.circuits:
-                if circuit.is_closed():
-                    print(circuit.calculate_current())
-            """
+            self.debug()
 
         pygame.quit()
 

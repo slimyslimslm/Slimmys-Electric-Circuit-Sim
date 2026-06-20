@@ -1,10 +1,13 @@
 import pygame 
+from node import Node 
 
 class ElectricCircuit:
     def __init__(self, components):
         if type(components) != list:
             raise TypeError("Electric Circuit components must be a list of CircuitComponents")
         self.components = components 
+        
+        self.nodes = []
 
         self.total_resistance = 0
 
@@ -55,6 +58,14 @@ class ElectricCircuit:
             previous = node 
 
         return False 
+    
+    def node_of_component(self, component) -> Node | None:
+        """Returns the node the component is a part of. Returns None if component is not in any nodes"""
+        for node in self.nodes:
+            if component in node.end_components or component in node.internal_wires:
+                return node 
+            
+        return None 
     
     def _calculate_series_resistance(self, r1: float , r2: float) -> float:
         """Given two, resistances, calculate the equivalent resistance in series"""
